@@ -1,3 +1,7 @@
+/* Amelia Dahn, COP 3502, 3/14/24
+This code uses merge sort to sort arrays provided from files.
+*/
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,8 +33,63 @@ size_t Size(void* ptr)
 
 // implement merge sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void mergeSort(int pData[], int l, int r)
-{
+void mergeSort(int pData[], int l, int r){
+    //if array is sorted
+    if(l < r){
+
+    //find middle and perform recurssion
+    int m = l+(r-l)/2;
+    mergeSort(pData, l, m);
+    mergeSort(pData, m+1, r);
+
+    //create pointers and variables
+    int i, j, k;
+    int leftSize = m - l + 1;
+    int rightSize = r - m;
+    int *leftArr = (int *)Alloc(leftSize *sizeof(int));
+    int *rightArr = (int *)Alloc(rightSize *sizeof(int));
+
+
+    //merging
+    for (i = 0; i < leftSize; i++)
+        leftArr[i] = pData[l + i];
+    for (j = 0; j < rightSize; j++)
+        rightArr[j] = pData[m + 1 + j];
+
+    i = 0;
+    j = 0;
+    k = l;
+
+    //merge two sorted arrays
+    while (i < leftSIze && j < rightArr){
+        if (leftArr[i] <= rightArr[j]){
+            pData[k] = leftArr[i];
+            i++;
+        }
+        else{
+            pData[k] = rightArr[j];
+            j++;
+        }
+        k++;
+    }
+
+    //add remaining elements if there are any
+    while (i < leftSize){
+        pData[k] = leftArr[i];
+        i++;
+        k++;
+    }
+
+    while (j < rightSize){
+        pData[k] = rightArr[j];
+        j++;
+        k++;
+    }
+
+    //free memory
+    DeAlloc(rightArr);
+    DeAlloc(leftArr);
+    }
 }
 
 // parses input file to an integer array
@@ -67,19 +126,20 @@ int parseData(char *inputFileName, int **ppData)
 // prints first and last 100 items in the data array
 void printArray(int pData[], int dataSz)
 {
-	int i, sz = dataSz - 100;
-	printf("\tData:\n\t");
-	for (i=0;i<100;++i)
-	{
-		printf("%d ",pData[i]);
-	}
-	printf("\n\t");
-	
-	for (i=sz;i<dataSz;++i)
-	{
-		printf("%d ",pData[i]);
-	}
-	printf("\n\n");
+    int i, sz = (dataSz > 100 ? dataSz - 100 : 0);
+    int firstHundred = (dataSz < 100 ? dataSz : 100);
+    printf("\tData:\n\t");
+    for (i=0;i<firstHundred;++i)
+    {
+        printf("%d ",pData[i]);
+    }
+    printf("\n\t");
+    
+    for (i=sz;i<dataSz;++i)
+    {
+        printf("%d ",pData[i]);
+    }
+    printf("\n\n");
 }
 
 int main(void)
@@ -87,7 +147,7 @@ int main(void)
 	clock_t start, end;
 	int i;
     double cpu_time_used;
-	char* fileNames[] = { "input1.txt", "input2.txt", "input3.txt", "input4.txt" };
+	char* fileNames[] = { "input1.txt" };
 	
 	for (i=0;i<4;++i)
 	{
